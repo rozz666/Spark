@@ -4,9 +4,9 @@ cmake_minimum_required(VERSION 2.8)
 
 include_directories("." "gmock-1.6.0/fused-src" "dicpp/include")
 
-if(CMAKE_COMPILER_IS_GNUXX)
+if(UNIX)
     set(CMAKE_CXX_FLAGS "-Wall")
-endif(CMAKE_COMPILER_IS_GNUXX)
+endif(UNIX)
 
 add_library(
     gmock STATIC
@@ -34,3 +34,7 @@ add_executable(
 )
 
 target_link_libraries(spark_unittest gmock dicpp)
+
+if(UNIX)
+    target_link_libraries(spark_unittest pthread)
+endif(UNIX)
