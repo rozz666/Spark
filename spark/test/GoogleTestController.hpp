@@ -1,4 +1,4 @@
-// GameScript
+// Spark
 //
 // Copyright (c) 2011 Rafal Przywarski
 //
