@@ -8,6 +8,8 @@ if(UNIX)
     set(CMAKE_CXX_FLAGS "-Wall")
 endif(UNIX)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDI_DISABLE_LOGGING")
+
 add_library(
     gmock STATIC
     gmock-1.6.0/fused-src/gmock-gtest-all.cc
@@ -27,13 +29,25 @@ add_library(
     dicpp/lib/src/type_provider.cpp
 )
 
+add_library(
+    sparkcore STATIC
+    spark/Game.cpp
+)
+
 add_executable(
     spark_unittest
     spark/test/unit/main.cpp
     spark/test/GoogleTestController.cpp
+    spark/test/unit/Game.cpp
 )
 
-target_link_libraries(spark_unittest gmock dicpp)
+add_executable(
+    spark
+    spark/main.cpp
+)
+
+target_link_libraries(spark_unittest sparkcore gmock dicpp)
+target_link_libraries(spark sparkcore dicpp)
 
 if(UNIX)
     target_link_libraries(spark_unittest pthread)
