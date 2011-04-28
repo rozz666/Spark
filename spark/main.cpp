@@ -12,6 +12,7 @@
 #include <sstream>
 #include <typeinfo>
 #include <iostream>
+#include "io/Dispatcher.hpp"
 
 
 namespace spark
@@ -45,6 +46,9 @@ struct GameModule
         r.add(
             r.type<Game>()
         );
+        r.add(
+            r.type<io::IDispatcher>().implementation<io::Dispatcher>()
+        );
     }
 };
 
@@ -54,7 +58,7 @@ void runGame()
     {
         di::injector injector;
         injector.install(GameModule());
-        SharedGame game = injector.construct<SharedGame>();
+        PGame game = injector.construct<PGame>();
         game->run();
     }
     catch (const std::exception& e)

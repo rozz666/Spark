@@ -6,14 +6,17 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-#include <spark/Game.hpp>
+#include <spark/io/Dispatcher.hpp>
 
 namespace spark
 {
-
-void Game::run()
+namespace io
 {
-    while (dispatcher->processFrame());
+
+bool Dispatcher::processFrame()
+{
+    return false;
 }
 
+}
 }

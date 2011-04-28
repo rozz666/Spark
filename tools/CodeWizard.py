@@ -26,6 +26,12 @@ class License:
 class ClassQualifiedName:
     def __init__(self, qualifiedName):
         self._ids = qualifiedName.split(".")
+    @staticmethod
+    def withPrefix(prefix, qualifiedName):
+        cqn = ClassQualifiedName(qualifiedName)
+        cqn._ids = qualifiedName.split(".")
+        cqn._ids[-1] = prefix + cqn._ids[-1]
+        return cqn
     def getNamespaces(self):
         return self._ids[0:-1]
     def getName(self):
@@ -64,7 +70,7 @@ class ClassWizard(Wizard):
         for id in namespaces:
             text += "namespace " + id + "\n{\n"
         text += "\nclass " + className + "\n{\npublic:\n};\n\n"
-        text += "typedef boost::shared_ptr<" + className + "> Shared" + className + ";\n\n"
+        text += "typedef boost::shared_ptr<" + className + "> P" + className + ";\n\n"
         for id in namespaces:
             text += "}\n"
         text += "#endif /* " + guard + " */\n"
@@ -122,7 +128,7 @@ class InterfaceWizard(Wizard):
         text += "protected:\n"
         text += "    " + className + "& operator=(const " + className + "& ) { return *this; }\n"
         text += "};\n\n"
-        text += "typedef boost::shared_ptr<" + className + "> Shared" + className + ";\n\n"
+        text += "typedef boost::shared_ptr<" + className + "> P" + className + ";\n\n"
         for id in namespaces:
             text += "}\n"
         text += "#endif /* " + guard + " */\n"
@@ -147,14 +153,14 @@ class MockWizard(Wizard):
         text += "\nstruct " + className + " : " + origClassQName.getName() + "\n"
         text += "{\n"
         text += "};\n\n"
-        text += "typedef boost::shared_ptr<" + className + "> Shared" + className + ";\n\n"
+        text += "typedef boost::shared_ptr<" + className + "> P" + className + ";\n\n"
         for id in namespaces:
             text += "}\n"
         text += "#endif /* " + guard + " */\n"
         self.writeFile(classQName.getMockPath(), text)
 
     def createMock(self, strName):
-        classQName = ClassQualifiedName(strName + "Mock")
+        classQName = ClassQualifiedName.withPrefix("M", strName)
         origClassQName = ClassQualifiedName(strName)
         self.createMockFile(classQName, origClassQName)
 

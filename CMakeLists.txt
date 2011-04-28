@@ -33,11 +33,17 @@ add_library(
     spark/Game.cpp
 )
 
+add_library(
+    sparkio STATIC
+    spark/io/Dispatcher.cpp
+)
+
 add_executable(
     spark_unittest
     spark/test/unit/main.cpp
     spark/test/GoogleTestController.cpp
     spark/test/unit/Game.cpp
+    spark/test/unit/io/Dispatcher.cpp
 )
 
 add_executable(
@@ -45,8 +51,8 @@ add_executable(
     spark/main.cpp
 )
 
-target_link_libraries(spark_unittest sparkcore gmock dicpp)
-target_link_libraries(spark sparkcore dicpp)
+target_link_libraries(spark_unittest sparkcore sparkio gmock dicpp)
+target_link_libraries(spark sparkcore sparkio dicpp)
 
 if(UNIX)
     target_link_libraries(spark_unittest pthread)

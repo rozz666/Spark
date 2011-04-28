@@ -6,31 +6,25 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef SPARK_GAME_HPP
-#define SPARK_GAME_HPP
+#ifndef SPARK_IO_DISPATCHER_HPP
+#define SPARK_IO_DISPATCHER_HPP
 
 #include <boost/shared_ptr.hpp>
-#include <di/constructor.hpp>
 #include <spark/io/IDispatcher.hpp>
 
 namespace spark
 {
+namespace io
+{
 
-class Game
+class Dispatcher : public IDispatcher
 {
 public:
-
-    DI_CONSTRUCTOR(Game, (io::PIDispatcher dispatcher))
-        : dispatcher(dispatcher) { }
-
-    void run();
-
-private:
-
-    io::PIDispatcher dispatcher;
+    virtual bool processFrame();
 };
 
-typedef boost::shared_ptr<Game> PGame;
+typedef boost::shared_ptr<Dispatcher> PDispatcher;
 
 }
-#endif /* SPARK_GAME_HPP */
+}
+#endif /* SPARK_IO_DISPATCHER_HPP */
