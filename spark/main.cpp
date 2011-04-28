@@ -12,7 +12,7 @@
 #include <sstream>
 #include <typeinfo>
 #include <iostream>
-#include "io/Dispatcher.hpp"
+#include <spark/io/Dispatcher.hpp>
 
 
 namespace spark
