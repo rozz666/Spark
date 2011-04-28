@@ -7,7 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //
 #include <spark/Game.hpp>
-#include <gmock/gmock.h>
+#include <spark/test/googlemock.hpp>
 
 using namespace testing;
 using namespace spark;

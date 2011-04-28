@@ -84,9 +84,10 @@ class ClassWizard(Wizard):
         fixtureName = classQName.getFixtureName()
         text = License.getText()
         text += "#include <" + classQName.getHeaderPath() + ">\n"
-        text += "#include <gmock/gmock.h>\n"
+        text += "#include <spark/test/googlemock.hpp>\n"
         text += "\n"
         text += "using namespace testing;\n"
+        text += "using namespace spark;\n"
         text += "\n"
         text += "struct " + fixtureName + " : testing::Test\n"
         text += "{\n"
@@ -119,8 +120,6 @@ class InterfaceWizard(Wizard):
         text += "public:\n"
         text += "    virtual ~" + className + "() { }\n"
         text += "protected:\n"
-        text += "    " + className + "() { }\n"
-        text += "    " + className + "(const " + className + "& ) { }\n"
         text += "    " + className + "& operator=(const " + className + "& ) { return *this; }\n"
         text += "};\n\n"
         text += "typedef boost::shared_ptr<" + className + "> Shared" + className + ";\n\n"
@@ -142,7 +141,7 @@ class MockWizard(Wizard):
         text = License.getText()
         text += "#ifndef " + guard + "\n#define " + guard + "\n\n"
         text += "#include <" + origClassQName.getHeaderPath() + ">\n"
-        text += "#include <gmock/gmock.h>\n\n"
+        text += "#include <spark/test/googlemock.hpp>\n\n"
         for id in namespaces:
             text += "namespace " + id + "\n{\n"
         text += "\nstruct " + className + " : " + origClassQName.getName() + "\n"
