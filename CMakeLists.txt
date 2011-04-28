@@ -19,7 +19,6 @@ add_library(
     dicpp STATIC
     dicpp/lib/src/type_info.cpp
     dicpp/lib/src/scope.cpp
-    dicpp/lib/src/scopes
     dicpp/lib/src/scopes/thread_local_singleton.cpp
     dicpp/lib/src/scopes/no_scope.cpp
     dicpp/lib/src/scopes/singleton.cpp
