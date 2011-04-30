@@ -49,6 +49,20 @@ class ClassQualifiedName:
     def getFixtureName(self):
         return "_".join(self._ids)
 
+class OsClassQualifiedName(ClassQualifiedName):
+    def __init__(self, qualifiedName, os):
+        ClassQualifiedName.__init__(self, qualifiedName)
+        self._os = os
+    def getHeaderPath(self):
+        return self._os + "/" + ClassQualifiedName.getHeaderPath(self)
+    def getSourcePath(self):
+        return self._os + "/" + ClassQualifiedName.getSourcePath(self)
+    def getUnitTestPath(self):
+        return self._os + "/" + ClassQualifiedName.getUnitTestPath(self)
+    def getMockPath(self):
+        return self._os + "/" + ClassQualifiedName.getMockPath(self)
+
+
 class Wizard:
     def writeFile(self, fileName, text):
         path = fileName.rpartition("/")[0]
@@ -109,6 +123,11 @@ class ClassWizard(Wizard):
         self.createHeaderFile(classQName)
         self.createSourceFile(classQName)
         self.createUnitTestFile(classQName)
+
+    def createOsClass(self, strName, os):
+        classQName = OsClassQualifiedName(strName, os)
+        self.createHeaderFile(classQName)
+        self.createSourceFile(classQName)
 
 class InterfaceWizard(Wizard):
     def createHeaderFile(self, classQName):
@@ -180,8 +199,12 @@ class CodeWizard(QtGui.QMainWindow):
 
     def initUi(self):
 
-        createClassAction = QtGui.QAction("Create Class", self)
+        createClassAction = QtGui.QAction("Create Class with UT", self)
         createClassAction.setStatusTip("Create a class with a test suite")
+        createUnixClassAction = QtGui.QAction("Create Unix Class", self)
+        createUnixClassAction.setStatusTip("Create a Unix class")
+        createWin32ClassAction = QtGui.QAction("Create Win32 Class", self)
+        createWin32ClassAction.setStatusTip("Create a Win32 class")
         createInterfaceAction = QtGui.QAction("Create Interface", self)
         createInterfaceAction.setStatusTip("Create an interface")
         createMockAction = QtGui.QAction("Create Mock", self)
@@ -189,12 +212,16 @@ class CodeWizard(QtGui.QMainWindow):
         createFactoryAction = QtGui.QAction("Create Factory", self)
         createFactoryAction.setStatusTip("Create a factory")
         self.connect(createClassAction, QtCore.SIGNAL("triggered()"), self.createClass)
+        self.connect(createUnixClassAction, QtCore.SIGNAL("triggered()"), self.createUnixClass)
+        self.connect(createWin32ClassAction, QtCore.SIGNAL("triggered()"), self.createWin32Class)
         self.connect(createInterfaceAction, QtCore.SIGNAL("triggered()"), self.createInterface)
         self.connect(createMockAction, QtCore.SIGNAL("triggered()"), self.createMock)
         self.connect(createFactoryAction, QtCore.SIGNAL("triggered()"), self.createFactory)
 
         self.toolbar = self.addToolBar("Main")
         self.toolbar.addAction(createClassAction)
+        self.toolbar.addAction(createUnixClassAction)
+        self.toolbar.addAction(createWin32ClassAction)
         self.toolbar.addAction(createInterfaceAction)
         self.toolbar.addAction(createMockAction)
         self.toolbar.addAction(createFactoryAction)
@@ -208,6 +235,18 @@ class CodeWizard(QtGui.QMainWindow):
         if not ok:
             return
         ClassWizard().createClass(str(classQualifiedName))
+
+    def createUnixClass(self):
+        classQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Unix Class', 'Enter class name:')
+        if not ok:
+            return
+        ClassWizard().createOsClass(str(classQualifiedName), 'unix')
+
+    def createWin32Class(self):
+        classQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Win32 Class', 'Enter class name:')
+        if not ok:
+            return
+        ClassWizard().createOsClass(str(classQualifiedName), 'win32')
 
     def createInterface(self):
         interfaceQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Interface', 'Enter interface name:')
