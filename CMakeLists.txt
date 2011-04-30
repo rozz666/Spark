@@ -50,10 +50,17 @@ add_executable(
     spark/test/unit/io/Dispatcher.cpp
 )
 
+if(UNIX)
 add_executable(
     spark
-    ${OS_NAME}/spark/main.cpp
+    unix/spark/main.cpp
 )
+else(UNIX)
+add_executable(
+    spark WIN32
+    win32/spark/main.cpp
+)
+endif(UNIX)
 
 target_link_libraries(spark_unittest sparkcore sparkio gmock dicpp)
 target_link_libraries(spark sparkcore sparkio dicpp)
