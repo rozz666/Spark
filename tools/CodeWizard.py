@@ -38,8 +38,10 @@ class ClassQualifiedName:
         return self._ids[-1]
     def getHeaderGuard(self):
         return "_".join(self._ids).upper() + "_HPP"
-    def getHeaderPath(self):
+    def getIncludePath(self):
         return "/".join(self._ids) + ".hpp"
+    def getHeaderPath(self):
+        return self.getIncludePath()
     def getSourcePath(self):
         return "/".join(self._ids) + ".cpp"
     def getUnitTestPath(self):
@@ -93,7 +95,7 @@ class ClassWizard(Wizard):
     def createSourceFile(self, classQName):
         namespaces = classQName.getNamespaces()
         text = License.getText()
-        text += "#include <" + classQName.getHeaderPath() + ">\n\n"
+        text += "#include <" + classQName.getIncludePath() + ">\n\n"
         for id in namespaces:
             text += "namespace " + id + "\n{\n"
         for id in namespaces:
@@ -103,7 +105,7 @@ class ClassWizard(Wizard):
     def createUnitTestFile(self, classQName):
         fixtureName = classQName.getFixtureName()
         text = License.getText()
-        text += "#include <" + classQName.getHeaderPath() + ">\n"
+        text += "#include <" + classQName.getIncludePath() + ">\n"
         text += "#include <spark/test/googlemock.hpp>\n"
         text += "\n"
         text += "using namespace testing;\n"

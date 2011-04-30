@@ -2,11 +2,14 @@ project(spark)
 
 cmake_minimum_required(VERSION 2.8)
 
-include_directories("." "gmock-1.6.0/fused-src" "dicpp/include")
-
 if(UNIX)
     set(CMAKE_CXX_FLAGS "-Wall")
+    set(OS_NAME "unix")
+elseif(WIN32)
+    set(OS_NAME "win32")
 endif(UNIX)
+
+include_directories("." ${OS_NAME} "gmock-1.6.0/fused-src" "dicpp/include")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDI_DISABLE_LOGGING")
 
@@ -31,6 +34,7 @@ add_library(
 add_library(
     sparkcore STATIC
     spark/Game.cpp
+    spark/GameModule.cpp
 )
 
 add_library(
@@ -48,7 +52,7 @@ add_executable(
 
 add_executable(
     spark
-    spark/main.cpp
+    ${OS_NAME}/spark/main.cpp
 )
 
 target_link_libraries(spark_unittest sparkcore sparkio gmock dicpp)

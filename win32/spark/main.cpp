@@ -6,13 +6,14 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
+#include <spark/GameModule.hpp>
 #include <spark/Game.hpp>
 #include <di/injector.hpp>
 #include <exception>
-#include <sstream>
 #include <typeinfo>
 #include <iostream>
-#include <spark/io/Dispatcher.hpp>
+#include <sstream>
+#include <windows.h>
 
 
 namespace spark
@@ -22,35 +23,14 @@ void reportException(const std::exception& e)
 {
     std::ostringstream os;
     os << "An internal exception of type " << typeid(e).name() << " has occured:\n" << e.what();
-#ifdef _WIN32
-    MessageBoxA(0, os.str().c_str(), "Exception", MB_ICONERROR | MB_YESNO | MB_DEFBUTTON2) == IDYES);
-#else // _WIN32
-    std::cerr << os.str();
-#endif // _WIN32
+    MessageBoxA(0, os.str().c_str(), "Exception", MB_ICONERROR | MB_YESNO | MB_DEFBUTTON2);
 }
 
 void reportUnknownException()
 {
-    const char *msg = "An internal exception of unknown type has occured!";
-#ifdef _WIN32
-    MessageBoxA(0, msg, "Exception", MB_ICONERROR | MB_YESNO | MB_DEFBUTTON2) == IDYES);
-#else // _WIN32
-    std::cerr << msg;
-#endif // _WIN32
+    MessageBoxA(
+        0, "An internal exception of unknown type has occured!", "Exception", MB_ICONERROR | MB_YESNO | MB_DEFBUTTON2);
 }
-
-struct GameModule
-{
-    void operator()(di::registry& r)
-    {
-        r.add(
-            r.type<Game>()
-        );
-        r.add(
-            r.type<io::IDispatcher>().implementation<io::Dispatcher>()
-        );
-    }
-};
 
 void runGame()
 {
@@ -73,15 +53,8 @@ void runGame()
 
 }
 
-#ifdef _WIN32
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
     spark::runGame();
     return 0;
 }
-#else // _WIN32
-int main()
-{
-    spark::runGame();
-}
-#endif // _WIN32
