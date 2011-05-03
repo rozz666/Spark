@@ -68,17 +68,10 @@ add_executable(
     ${OS_SPECIFIC_UNITTESTS}
 )
 
-if(UNIX)
 add_executable(
     spark
-    unix/spark/main.cpp
+    ${OS_NAME}/spark/main.cpp
 )
-else(UNIX)
-add_executable(
-    spark WIN32
-    win32/spark/main.cpp
-)
-endif(UNIX)
 
 target_link_libraries(spark_unittest sparkcore sparkio sparksystemmock gmock dicpp)
 target_link_libraries(spark sparkcore sparkio sparksystem dicpp)
