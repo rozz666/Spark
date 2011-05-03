@@ -11,6 +11,8 @@
 
 #include <boost/shared_ptr.hpp>
 #include <spark/io/IDispatcher.hpp>
+#include <spark/io/ITimer.hpp>
+#include <di/constructor.hpp>
 
 namespace spark
 {
@@ -20,7 +22,10 @@ namespace io
 class Dispatcher : public IDispatcher
 {
 public:
+    DI_CONSTRUCTOR(Dispatcher, (PITimer timer)) : timer(timer) { }
     virtual bool processFrame();
+private:
+    PITimer timer;
 };
 
 typedef boost::shared_ptr<Dispatcher> PDispatcher;

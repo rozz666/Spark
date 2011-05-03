@@ -6,16 +6,17 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-#include <spark/io/Dispatcher.hpp>
+#include <cstddef>
+#include <spark/test/unit/mock/system.hpp>
 
 namespace spark
 {
-namespace io
+namespace system
 {
 
-bool Dispatcher::processFrame()
+int gettimeofday(timeval& tv)
 {
-    return timer->getMillis() < 5000;
+    return mock::systemMock->gettimeofday(tv);
 }
 
 }

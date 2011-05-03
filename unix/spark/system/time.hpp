@@ -6,17 +6,18 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-#include <spark/io/Dispatcher.hpp>
+#ifndef SPARK_SYSTEM_TIME_HPP
+#define SPARK_SYSTEM_TIME_HPP
+
+#include <sys/time.h>
 
 namespace spark
 {
-namespace io
+namespace system
 {
 
-bool Dispatcher::processFrame()
-{
-    return timer->getMillis() < 5000;
-}
+int gettimeofday(timeval& tv);
 
 }
 }
+#endif /* SPARK_SYSTEM_TIME_HPP */

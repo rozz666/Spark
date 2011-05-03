@@ -40,7 +40,24 @@ add_library(
 add_library(
     sparkio STATIC
     spark/io/Dispatcher.cpp
+    ${OS_NAME}/spark/io/Timer.cpp
 )
+
+if(UNIX)
+    add_library(sparksystem STATIC
+        unix/spark/system/time.cpp
+    )
+    add_library(sparksystemmock STATIC
+        unix/spark/test/unit/mock/system/time.cpp
+        unix/spark/test/unit/mock/system.cpp
+    )
+    set(OS_SPECIFIC_UNITTESTS
+        unix/spark/test/unit/io/Timer.cpp
+    )
+elseif(WIN32)
+    add_library(sparksystem STATIC)
+    add_library(sparksystemmock STATIC)
+endif(UNIX)
 
 add_executable(
     spark_unittest
@@ -48,6 +65,7 @@ add_executable(
     spark/test/GoogleTestController.cpp
     spark/test/unit/Game.cpp
     spark/test/unit/io/Dispatcher.cpp
+    ${OS_SPECIFIC_UNITTESTS}
 )
 
 add_executable(
@@ -55,8 +73,8 @@ add_executable(
     ${OS_NAME}/spark/main.cpp
 )
 
-target_link_libraries(spark_unittest sparkcore sparkio gmock dicpp)
-target_link_libraries(spark sparkcore sparkio dicpp)
+target_link_libraries(spark_unittest sparkcore sparkio sparksystemmock gmock dicpp)
+target_link_libraries(spark sparkcore sparkio sparksystem dicpp)
 
 if(UNIX)
     target_link_libraries(spark_unittest pthread)
