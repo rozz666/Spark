@@ -10,6 +10,7 @@
 #include <spark/Game.hpp>
 #include <spark/io/Dispatcher.hpp>
 #include <spark/io/Timer.hpp>
+#include <spark/video/GLRenderer.hpp>
 
 namespace spark
 {
@@ -24,6 +25,9 @@ void GameModule::operator()(di::registry& r)
     );
     r.add(
         r.type<io::ITimer>().implementation<io::Timer>()
+    );
+    r.add(
+        r.type<video::IRenderer>().implementation<video::GLRenderer>()
     );
 }
 

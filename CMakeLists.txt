@@ -43,6 +43,11 @@ add_library(
     ${OS_NAME}/spark/io/Timer.cpp
 )
 
+add_library(
+    sparkvideo STATIC
+    spark/video/GLRenderer.cpp
+)
+
 if(UNIX)
     add_library(sparksystem STATIC
         unix/spark/system/time.cpp
@@ -73,6 +78,7 @@ add_executable(
     spark/test/GoogleTestController.cpp
     spark/test/unit/Game.cpp
     spark/test/unit/io/Dispatcher.cpp
+    spark/test/unit/video/GLRenderer.cpp
     ${OS_SPECIFIC_UNITTESTS}
 )
 
@@ -82,8 +88,8 @@ else(WIN32)
     add_executable(spark unix/spark/main.cpp)
 endif(WIN32)
 
-target_link_libraries(spark_unittest sparkcore sparkio sparksystemmock gmock dicpp)
-target_link_libraries(spark sparkcore sparkio sparksystem dicpp)
+target_link_libraries(spark_unittest sparkcore sparkio sparkvideo sparksystemmock gmock dicpp)
+target_link_libraries(spark sparkcore sparkio sparkvideo sparksystem dicpp)
 
 if(UNIX)
     target_link_libraries(spark_unittest pthread)

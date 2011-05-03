@@ -12,6 +12,7 @@
 #include <boost/shared_ptr.hpp>
 #include <di/constructor.hpp>
 #include <spark/io/IDispatcher.hpp>
+#include <spark/video/IRenderer.hpp>
 
 namespace spark
 {
@@ -20,14 +21,15 @@ class Game
 {
 public:
 
-    DI_CONSTRUCTOR(Game, (io::PIDispatcher dispatcher))
-        : dispatcher(dispatcher) { }
+    DI_CONSTRUCTOR(Game, (io::PIDispatcher dispatcher, video::PIRenderer renderer))
+        : dispatcher(dispatcher), renderer(renderer) { }
 
     void run();
 
 private:
 
     io::PIDispatcher dispatcher;
+    video::PIRenderer renderer;
 };
 
 typedef boost::shared_ptr<Game> PGame;

@@ -6,17 +6,12 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-#include <spark/Game.hpp>
+#include <spark/video/GLRenderer.hpp>
 
 namespace spark
 {
-
-void Game::run()
+namespace video
 {
-    while (dispatcher->processFrame())
-    {
-        renderer->processFrame();
-    }
+void GLRenderer::processFrame() { }
 }
-
 }
