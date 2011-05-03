@@ -55,8 +55,16 @@ if(UNIX)
         unix/spark/test/unit/io/Timer.cpp
     )
 elseif(WIN32)
-    add_library(sparksystem STATIC)
-    add_library(sparksystemmock STATIC)
+    add_library(sparksystem STATIC
+        win32/spark/system/windows.cpp
+    )
+    add_library(sparksystemmock STATIC
+        win32/spark/test/unit/mock/system/windows.cpp
+        win32/spark/test/unit/mock/system.cpp
+    )
+    set(OS_SPECIFIC_UNITTESTS
+        win32/spark/test/unit/io/Timer.cpp
+    )
 endif(UNIX)
 
 add_executable(
@@ -68,14 +76,23 @@ add_executable(
     ${OS_SPECIFIC_UNITTESTS}
 )
 
-add_executable(
-    spark
-    ${OS_NAME}/spark/main.cpp
+if(UNIX)
+    add_executable(
+        spark
+        unix/spark/main.cpp
 )
+else(UNIX)
+    add_executable(
+        spark WIN32
+        win32/spark/main.cpp
+)
+endif(UNIX)
 
 target_link_libraries(spark_unittest sparkcore sparkio sparksystemmock gmock dicpp)
 target_link_libraries(spark sparkcore sparkio sparksystem dicpp)
 
 if(UNIX)
     target_link_libraries(spark_unittest pthread)
+elseif(WIN32)
+    target_link_libraries(spark winmm)
 endif(UNIX)
