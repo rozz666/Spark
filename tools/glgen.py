@@ -68,6 +68,7 @@ def generateInterface(methods, path):
     f.write("{\n")
     f.write("public:\n");
     f.write("    virtual ~IGLContext() { }\n");
+    f.write("    virtual void swapBuffers() = 0;\n");
     for m in methods:
         f.write("    virtual {0} {1}({2}) = 0;\n".format(m[0], m[1], m[2]))
     f.write("};\n\n")
@@ -76,13 +77,79 @@ def generateInterface(methods, path):
     f.write("}\n")
     f.write("#endif // SPARK_VIDEO_IGLCONTEXT_HPP\n")
 
+def generateHeader(methods, path):
+    f = open(path, 'w')
+    for l in open("gllicense").readlines():
+        f.write(l)
+    f.write("#ifndef SPARK_VIDEO_GLCONTEXT_HPP\n")
+    f.write("#define SPARK_VIDEO_GLCONTEXT_HPP\n")
+    f.write("#include <spark/video/IGLContext.hpp>\n")
+    f.write("#include <boost/noncopyable.hpp>\n")
+    f.write("namespace spark\n")
+    f.write("{\n")
+    f.write("namespace video\n")
+    f.write("{\n\n")
+    f.write("class GLContext : public IGLContext, boost::noncopyable\n")
+    f.write("{\n")
+    f.write("public:\n");
+    f.write("    virtual ~GLContext();\n");
+    f.write("    virtual void swapBuffers();\n");
+    for m in methods:
+        f.write("    virtual {0} {1}({2});\n".format(m[0], m[1], m[2]))
+    f.write("private:\n\n")
+    for m in methods:
+        f.write("    PFN{0}PROC {1}_;\n".format(m[1].upper(), m[1]))
+    f.write("};\n\n")
+    f.write("typedef boost::shared_ptr<GLContext> PGLContext;\n\n");
+    f.write("}\n")
+    f.write("}\n")
+    f.write("#endif // SPARK_VIDEO_GLCONTEXT_HPP\n")
+
+def generateSource(methods, path):
+    f = open(path, 'w')
+    for l in open("gllicense").readlines():
+        f.write(l)
+    f.write("#ifndef SPARK_VIDEO_GLCONTEXT_HPP\n")
+    f.write("#define SPARK_VIDEO_GLCONTEXT_HPP\n")
+    f.write("#include <spark/video/IGLContext.hpp>\n")
+    f.write("#include <boost/noncopyable.hpp>\n")
+    f.write("namespace spark\n")
+    f.write("{\n")
+    f.write("namespace video\n")
+    f.write("{\n\n")
+    f.write("class GLContext : public IGLContext, boost::noncopyable\n")
+    f.write("{\n")
+    f.write("public:\n");
+    f.write("    virtual ~GLContext();\n");
+    f.write("    virtual void swapBuffers();\n");
+    for m in methods:
+        f.write("    virtual {0} {1}({2})\n".format(m[0], m[1], m[2]))
+        f.write("    {\n")
+        if (m[0] != 'void'):
+            f.write("        return ")
+        else:
+            f.write("        ");
+        params = []
+        if m[2].strip() != "void":
+            params = [re.match(".*[ \*](\w+) *", p).group(1).strip() for p in m[2].split(",")]
+        f.write("{0}_({1});\n".format(m[1], string.join(params, ", ")))
+        f.write("    }\n\n")
+    f.write("private:\n\n")
+    for m in methods:
+        f.write("    PFN{0}PROC {1}_;\n".format(m[1].upper(), m[1]))
+    f.write("};\n\n")
+    f.write("typedef boost::shared_ptr<GLContext> PGLContext;\n\n");
+    f.write("}\n")
+    f.write("}\n")
+    f.write("#endif // SPARK_VIDEO_GLCONTEXT_HPP\n")
+    
 def generateMock(methods, path):
     f = open(path, 'w')
     for l in open("gllicense").readlines():
         f.write(l)
     f.write("#ifndef SPARK_VIDEO_MIGLCONTEXT_HPP\n")
     f.write("#define SPARK_VIDEO_MIGLCONTEXT_HPP\n")
-    f.write("#include <spark/test/unit/video/MIGLContext.hpp>\n")
+    f.write("#include <spark/video/IGLContext.hpp>\n")
     f.write("#include <spark/test/googlemock.hpp>\n\n")
     f.write("namespace spark\n")
     f.write("{\n")
@@ -117,3 +184,5 @@ methods.extend(parseGL(sys.argv[1], glVersions))
 methods.extend(parseGLext(sys.argv[2], glExtensions))
 generateInterface(methods, "IGLContext.hpp")
 generateMock(methods, "MIGLContext.hpp")
+generateHeader(methods, "GLContext.hpp")
+generateSource(methods, "GLContext.cpp")
