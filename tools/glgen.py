@@ -111,35 +111,26 @@ def generateSource(methods, path):
         f.write(l)
     f.write("#ifndef SPARK_VIDEO_GLCONTEXT_HPP\n")
     f.write("#define SPARK_VIDEO_GLCONTEXT_HPP\n")
-    f.write("#include <spark/video/IGLContext.hpp>\n")
-    f.write("#include <boost/noncopyable.hpp>\n")
+    f.write("#include <spark/video/GLContext.hpp>\n")
     f.write("namespace spark\n")
     f.write("{\n")
     f.write("namespace video\n")
     f.write("{\n\n")
-    f.write("class GLContext : public IGLContext, boost::noncopyable\n")
-    f.write("{\n")
-    f.write("public:\n");
-    f.write("    virtual ~GLContext();\n");
-    f.write("    virtual void swapBuffers();\n");
+    f.write("GLContext::~GLContext()\n{\n}\n");
+    f.write("void GLContext::swapBuffers()\n{\n}\n");
     for m in methods:
-        f.write("    virtual {0} {1}({2})\n".format(m[0], m[1], m[2]))
-        f.write("    {\n")
+        f.write("{0} GLContext::{1}({2})\n".format(m[0], m[1], m[2]))
+        f.write("{\n")
         if (m[0] != 'void'):
-            f.write("        return ")
+            f.write("    return ")
         else:
-            f.write("        ");
+            f.write("    ");
         params = []
         if m[2].strip() != "void":
             params = [re.match(".*[ \*](\w+) *", p).group(1).strip() for p in m[2].split(",")]
         f.write("{0}_({1});\n".format(m[1], string.join(params, ", ")))
-        f.write("    }\n\n")
-    f.write("private:\n\n")
-    for m in methods:
-        f.write("    PFN{0}PROC {1}_;\n".format(m[1].upper(), m[1]))
-    f.write("};\n\n")
-    f.write("typedef boost::shared_ptr<GLContext> PGLContext;\n\n");
-    f.write("}\n")
+        f.write("}\n\n")
+    f.write("\n}\n")
     f.write("}\n")
     f.write("#endif // SPARK_VIDEO_GLCONTEXT_HPP\n")
     
