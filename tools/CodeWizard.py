@@ -29,7 +29,6 @@ class ClassQualifiedName:
     @staticmethod
     def withPrefix(prefix, qualifiedName):
         cqn = ClassQualifiedName(qualifiedName)
-        cqn._ids = qualifiedName.split(".")
         cqn._ids[-1] = prefix + cqn._ids[-1]
         return cqn
     def getNamespaces(self):
@@ -55,6 +54,11 @@ class OsClassQualifiedName(ClassQualifiedName):
     def __init__(self, qualifiedName, os):
         ClassQualifiedName.__init__(self, qualifiedName)
         self._os = os
+    @staticmethod
+    def withPrefix(prefix, qualifiedName, os):
+        cqn = OsClassQualifiedName(qualifiedName, os)
+        cqn._ids[-1] = prefix + cqn._ids[-1]
+        return cqn
     def getHeaderPath(self):
         return self._os + "/" + ClassQualifiedName.getHeaderPath(self)
     def getSourcePath(self):
@@ -69,9 +73,8 @@ class Wizard:
     def writeFile(self, fileName, text):
         path = fileName.rpartition("/")[0]
         QtCore.QDir().mkpath(path)
-        f = QtCore.QFile(fileName)
-        f.open(QtCore.QIODevice.WriteOnly)
-        f.writeData(text)
+        f = open(fileName, "w")
+        f.write(text)
         f.close()
 
 class ClassWizard(Wizard):
@@ -131,6 +134,12 @@ class ClassWizard(Wizard):
         self.createHeaderFile(classQName)
         self.createSourceFile(classQName)
 
+    def createOsClassWithUT(self, strName, os):
+        classQName = OsClassQualifiedName(strName, os)
+        self.createHeaderFile(classQName)
+        self.createSourceFile(classQName)
+        self.createUnitTestFile(classQName)
+
 class InterfaceWizard(Wizard):
     def createHeaderFile(self, classQName):
         namespaces = classQName.getNamespaces()
@@ -159,6 +168,10 @@ class InterfaceWizard(Wizard):
         classQName = ClassQualifiedName(strName)
         self.createHeaderFile(classQName)
 
+    def createOsInterface(self, strName, os):
+        classQName = OsClassQualifiedName(strName, os)
+        self.createHeaderFile(classQName)
+
 class MockWizard(Wizard):
     def createMockFile(self, classQName, origClassQName):
         namespaces = classQName.getNamespaces()
@@ -185,6 +198,11 @@ class MockWizard(Wizard):
         origClassQName = ClassQualifiedName(strName)
         self.createMockFile(classQName, origClassQName)
 
+    def createOsMock(self, strName, os):
+        classQName = OsClassQualifiedName.withPrefix("M", strName, os)
+        origClassQName = OsClassQualifiedName(strName, os)
+        self.createMockFile(classQName, origClassQName)
+
 class FactoryWizard(Wizard):
     def createFactory(self, strName):
         classQName = ClassQualifiedName(strName)
@@ -205,27 +223,51 @@ class CodeWizard(QtGui.QMainWindow):
         createClassAction.setStatusTip("Create a class with a test suite")
         createUnixClassAction = QtGui.QAction("Create Unix Class", self)
         createUnixClassAction.setStatusTip("Create a Unix class")
+        createUnixClassWithUTAction = QtGui.QAction("Create Unix Class with UT", self)
+        createUnixClassWithUTAction.setStatusTip("Create a Unix class with a test suite")
         createWin32ClassAction = QtGui.QAction("Create Win32 Class", self)
         createWin32ClassAction.setStatusTip("Create a Win32 class")
+        createWin32ClassWithUTAction = QtGui.QAction("Create Win32 Class with UT", self)
+        createWin32ClassWithUTAction.setStatusTip("Create a Win32 class with a test suite")
         createInterfaceAction = QtGui.QAction("Create Interface", self)
         createInterfaceAction.setStatusTip("Create an interface")
+        createUnixInterfaceAction = QtGui.QAction("Create Unix Interface", self)
+        createUnixInterfaceAction.setStatusTip("Create a unix interface")
+        createWin32InterfaceAction = QtGui.QAction("Create Win32 Interface", self)
+        createWin32InterfaceAction.setStatusTip("Create a win32 interface")
         createMockAction = QtGui.QAction("Create Mock", self)
         createMockAction.setStatusTip("Create a mock")
+        createUnixMockAction = QtGui.QAction("Create Unix Mock", self)
+        createUnixMockAction.setStatusTip("Create a unix mock")
+        createWin32MockAction = QtGui.QAction("Create Win32 Mock", self)
+        createWin32MockAction.setStatusTip("Create a win32 mock")
         createFactoryAction = QtGui.QAction("Create Factory", self)
         createFactoryAction.setStatusTip("Create a factory")
         self.connect(createClassAction, QtCore.SIGNAL("triggered()"), self.createClass)
         self.connect(createUnixClassAction, QtCore.SIGNAL("triggered()"), self.createUnixClass)
+        self.connect(createUnixClassWithUTAction, QtCore.SIGNAL("triggered()"), self.createUnixClassWithUT)
         self.connect(createWin32ClassAction, QtCore.SIGNAL("triggered()"), self.createWin32Class)
+        self.connect(createWin32ClassWithUTAction, QtCore.SIGNAL("triggered()"), self.createWin32ClassWithUT)
         self.connect(createInterfaceAction, QtCore.SIGNAL("triggered()"), self.createInterface)
+        self.connect(createUnixInterfaceAction, QtCore.SIGNAL("triggered()"), self.createUnixInterface)
+        self.connect(createWin32InterfaceAction, QtCore.SIGNAL("triggered()"), self.createWin32Interface)
         self.connect(createMockAction, QtCore.SIGNAL("triggered()"), self.createMock)
+        self.connect(createUnixMockAction, QtCore.SIGNAL("triggered()"), self.createUnixMock)
+        self.connect(createWin32MockAction, QtCore.SIGNAL("triggered()"), self.createWin32Mock)
         self.connect(createFactoryAction, QtCore.SIGNAL("triggered()"), self.createFactory)
 
         self.toolbar = self.addToolBar("Main")
         self.toolbar.addAction(createClassAction)
         self.toolbar.addAction(createUnixClassAction)
+        self.toolbar.addAction(createUnixClassWithUTAction)
         self.toolbar.addAction(createWin32ClassAction)
+        self.toolbar.addAction(createWin32ClassWithUTAction)
         self.toolbar.addAction(createInterfaceAction)
+        self.toolbar.addAction(createUnixInterfaceAction)
+        self.toolbar.addAction(createWin32InterfaceAction)
         self.toolbar.addAction(createMockAction)
+        self.toolbar.addAction(createUnixMockAction)
+        self.toolbar.addAction(createWin32MockAction)
         self.toolbar.addAction(createFactoryAction)
         self.toolbar.setOrientation(QtCore.Qt.Vertical)
 
@@ -244,11 +286,23 @@ class CodeWizard(QtGui.QMainWindow):
             return
         ClassWizard().createOsClass(str(classQualifiedName), 'unix')
 
+    def createUnixClassWithUT(self):
+        classQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Unix Class', 'Enter class name:')
+        if not ok:
+            return
+        ClassWizard().createOsClassWithUT(str(classQualifiedName), 'unix')
+
     def createWin32Class(self):
         classQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Win32 Class', 'Enter class name:')
         if not ok:
             return
         ClassWizard().createOsClass(str(classQualifiedName), 'win32')
+
+    def createWin32ClassWithUT(self):
+        classQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Win32 Class', 'Enter class name:')
+        if not ok:
+            return
+        ClassWizard().createOsClassWithUT(str(classQualifiedName), 'win32')
 
     def createInterface(self):
         interfaceQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Interface', 'Enter interface name:')
@@ -256,11 +310,35 @@ class CodeWizard(QtGui.QMainWindow):
             return
         InterfaceWizard().createInterface(str(interfaceQualifiedName))
 
+    def createUnixInterface(self):
+        interfaceQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Unix Interface', 'Enter interface name:')
+        if not ok:
+            return
+        InterfaceWizard().createOsInterface(str(interfaceQualifiedName), 'unix')
+
+    def createWin32Interface(self):
+        interfaceQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Win32 Interface', 'Enter interface name:')
+        if not ok:
+            return
+        InterfaceWizard().createOsInterface(str(interfaceQualifiedName), 'win32')
+
     def createMock(self):
         mockQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Mock', 'Enter mock name:')
         if not ok:
             return
         MockWizard().createMock(str(mockQualifiedName))
+
+    def createUnixMock(self):
+        mockQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Unix Mock', 'Enter mock name:')
+        if not ok:
+            return
+        MockWizard().createOsMock(str(mockQualifiedName), 'unix')
+
+    def createWin32Mock(self):
+        mockQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Win32 Mock', 'Enter mock name:')
+        if not ok:
+            return
+        MockWizard().createOsMock(str(mockQualifiedName), 'win32')
 
     def createFactory(self):
         factoryQualifiedName, ok = QtGui.QInputDialog.getText(self, 'Create Factory', 'Enter factory name:')
